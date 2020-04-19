@@ -1,12 +1,17 @@
 {
-  "name": "@soberwp/postcss-range",
-  "version": "0.1.0",
-  "description": "PostCSS Range",
+  "name": "postcss-range-value",
+  "version": "0.0.0",
+  "description": "PostCSS range values",
   "author": "Darren Jacoby",
   "license": "MIT",
-  "repository": "soberwp/postcss-range",
-  "homepage": "https://github.com/soberwp/postcss-range",
-  "bugs": "https://github.com/soberwp/postcss-range/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soberwp/postcss-range-value.git"
+  },
+  "homepage": "https://github.com/soberwp/postcss-range-value",
+  "bugs": {
+    "url": "https://github.com/soberwp/postcss-range-value/issues"
+  },
   "main": "index.cjs.js",
   "module": "index.es.mjs",
   "files": [
@@ -44,7 +49,7 @@
     "css",
     "postcss-plugin",
     "postcss-range",
-    "postcss-responsive",
-    "postcss-fluid"
+    "postcss-range-value",
+    "postcss-responsive"
   ]
 }

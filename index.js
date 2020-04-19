@@ -1,16 +1,17 @@
 import postcss from 'postcss';
 import shorthands from './shorthands';
 
-export default postcss.plugin('postcss-starter', userOpts => {
+export default postcss.plugin('postcss-range-value', userOpts => {
   // config
   const defaultOpts = { rootRem: 16, prefix: 'range', screenMin: '48rem', screenMax: '87.5rem' };
   const opts = { ...defaultOpts, ...userOpts };
+  const regExp = new RegExp(escapeRegExp(opts.prefix) + '\\s*\\((.*)\\)', 'i');
 
 	return root => {
     root.walkRules(rule => {
       rule.walkDecls(decl => {
         // return from non-function declaration
-        if (!decl.value.includes(opts.prefix)) {
+        if (!decl.value.match(regExp)) {
           return;
         }
 
@@ -25,19 +26,19 @@ export default postcss.plugin('postcss-starter', userOpts => {
           // deconstruct prop and value from item
           const [prop, value] = item;
 
-          const valueRange = getDeclValues(value, opts.prefix);
+          const valueRange = getDeclValues(value, regExp);
 
-          // append decl and return if not shorthand range value
+          // append decl and return if not a range value
           if (!valueRange) {
             rule.append(postcss.decl({ prop, value }));
             return;
           }
 
-          // get array of range params
-          const rangeParams = postcss.list.comma(valueRange);
+          // get array of range value params
+          const params = postcss.list.comma(valueRange);
 
           // deconstruct and set opts defaults
-          const [userMin, userMax, screenMin = opts.screenMin, screenMax = opts.screenMax] = rangeParams;
+          const [userMin, userMax, screenMin = opts.screenMin, screenMax = opts.screenMax] = params;
 
           // create min/max values and work out value if unit is a ratio
           const min = isUnitRatio(userMin) ? getMinFromRatio(userMin, userMax) : userMin;
@@ -45,23 +46,22 @@ export default postcss.plugin('postcss-starter', userOpts => {
 
           // error reporting
           if (isUnitRatio(userMin) && isUnitRatio(userMax)) {
-            throw decl.error('Range requires a unit type for the minimum or maximum size.');
+            throw decl.error('Range value requires a unit type for the minimum or maximum size.');
           }
 
           if (!max) {
-            throw decl.error('Range requires a maximum unit size.');
+            throw decl.error('Range value requires a maximum unit size.');
           }
 
           if (!screenMin) {
-            throw decl.error('Range requires a minimum screen size.');
+            throw decl.error('Range value requires a minimum screen size.');
           }
 
           if (!screenMax) {
-            throw decl.error('Range requires a maximum screen size.');
+            throw decl.error('Range value requires a maximum screen size.');
           }
 
           // sizes to rem unit
-          // https://stackoverflow.com/questions/14810506/map-function-for-objects-instead-of-arrays
           const sizes = Object.assign({}, ...Object.entries({ min, max, screenMin, screenMax }).map(([k, v]) => ({ [k]: getUnitRem(v, opts.rootRem) })));
 
           // render rules
@@ -81,7 +81,7 @@ export default postcss.plugin('postcss-starter', userOpts => {
               });
             });
 
-          root.insertBefore(rule.next, rule.vw);
+          root.insertAfter(rule, rule.vw);
 
           // max size
           rule.max = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMax})` });
@@ -111,8 +111,7 @@ const getNewDecls = (prop, values) => {
 }
 
 // get declaration values
-const getDeclValues = (value, prefix) => {
-  const regExp = new RegExp(escapeRegExp(prefix) + '\\s*\\((.*)\\)', 'i'); // values between curly brackets
+const getDeclValues = (value, regExp) => {
   const match = value.match(regExp);
   return match ? match[1] : false;
 }
