@@ -1,0 +1,50 @@
+{
+  "name": "@soberwp/postcss-range",
+  "version": "0.1.0",
+  "description": "PostCSS Range",
+  "author": "Darren Jacoby",
+  "license": "MIT",
+  "repository": "soberwp/postcss-range",
+  "homepage": "https://github.com/soberwp/postcss-range",
+  "bugs": "https://github.com/soberwp/postcss-range/issues",
+  "main": "index.cjs.js",
+  "module": "index.es.mjs",
+  "files": [
+    "index.cjs.js",
+    "index.cjs.js.map",
+    "index.es.mjs",
+    "index.es.mjs.map"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm test",
+    "pretest": "rollup -c .rollup.js",
+    "test": "eslint *.js --cache --ignore-path .gitignore --quiet"
+  },
+  "engines": {
+    "node": ">= 8.0.0"
+  },
+  "dependencies": {
+    "postcss": "^7.0.27"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.6.1",
+    "eslint-config-dev": "^2.0.0",
+    "rollup": "^2.4.0",
+    "rollup-plugin-babel": "^4.4.0"
+  },
+  "eslintConfig": {
+    "extends": "dev",
+    "parser": "babel-eslint"
+  },
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "postcss-range",
+    "postcss-responsive",
+    "postcss-fluid"
+  ]
+}
