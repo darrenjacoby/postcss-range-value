@@ -1,6 +1,6 @@
 # postcss-range-value
 
-PostCSS plugin to add support for **`range()`**, allowing for responsive range values between two screen sizes.
+PostCSS plugin to add support for **`range()`**, allowing for a responsive range value between two screen sizes.
 
 ### Installation
 
