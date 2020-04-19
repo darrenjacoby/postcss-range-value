@@ -5,7 +5,7 @@ PostCSS plugin to add support for **`range()`**, allowing for a responsive range
 ### Installation
 
 ```shell
-yarn add postcss-range-value
+yarn add postcss-range-value --dev
 ```
 
 Require `postcssRange` at the top of Webpack or Mix:
