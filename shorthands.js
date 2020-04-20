@@ -1,9 +1,9 @@
 export default (prop, values) => {
-  if (prop.match(/^(margin|margin-block|margin-inline)$/)) {
+  if (/^(margin|margin-block|margin-inline)$/.test(prop)) {
     return margin(prop, values);
   }
 
-  if (prop.match(/^(padding|padding-block|padding-inline)$/)) {
+  if (/^(padding|padding-block|padding-inline)$/.test(prop)) {
     return padding(prop, values);
   }
 

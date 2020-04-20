@@ -3,7 +3,7 @@ import shorthands from './shorthands';
 
 export default postcss.plugin('postcss-range-value', userOpts => {
   // config
-  const defaultOpts = { rootRem: 16, prefix: 'range', screenMin: '48rem', screenMax: '87.5rem' };
+  const defaultOpts = { rootRem: 16, prefix: 'range', screenMin: '48rem', screenMax: '87.5rem', modernBrowsersOnly: false };
   const opts = { ...defaultOpts, ...userOpts };
   const regExp = new RegExp(escapeRegExp(opts.prefix) + '\\s*\\((.*)\\)', 'i');
 
@@ -11,7 +11,7 @@ export default postcss.plugin('postcss-range-value', userOpts => {
     root.walkRules(rule => {
       rule.walkDecls(decl => {
         // return from non-function declaration
-        if (!decl.value.match(regExp)) {
+        if (!regExp.test(decl.value)) {
           return;
         }
 
@@ -64,39 +64,60 @@ export default postcss.plugin('postcss-range-value', userOpts => {
           // sizes to rem unit
           const sizes = Object.assign({}, ...Object.entries({ min, max, screenMin, screenMax }).map(([k, v]) => ({ [k]: getUnitRem(v, opts.rootRem) })));
 
-          // render rules
+          // render
+          // support for clamp()
+          // https://caniuse.com/#feat=css-math-functions
+          // chrome 79+, ff 75+, edge 79+, opera 66+, andriod browser 80+
+          rule.append(postcss.decl({ prop, value: `clamp(${sizes.min}, calc(${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)}))), ${sizes.max})` }));
+
+          // no support for clamp()
           // min size
-          rule.append(postcss.decl({ prop, value: sizes.min }));
+          if (!opts.modernBrowsersOnly) {
+            // supports
+            rule.supports = postcss.atRule({ name: 'supports not', params: `(${prop}: clamp(${sizes.min}, calc(${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)}))), ${sizes.max}))` });
 
-          // vw based size
-          rule.vw = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMin})` });
+            root.insertAfter(rule, rule.supports);
 
-          rule
-            .vw
-            .append({ selector: rule.selector })
-            .walkRules(selector => {
-              selector.append({
-                prop,
-                value: `calc(${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})))`,
-              });
+            rule
+              .supports
+              .append({selector: rule.selector})
+              .walkRules(selector => {
+                selector.append({
+                  prop,
+                  value: sizes.min,
+                });
             });
 
-          root.insertAfter(rule, rule.vw);
+            // vw based size
+            rule.vw = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMin})` });
 
-          // max size
-          rule.max = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMax})` });
-
-          rule
-            .max
-            .append({selector: rule.selector})
-            .walkRules(selector => {
-              selector.append({
-                prop,
-                value: sizes.max,
+            rule
+              .vw
+              .append({ selector: rule.selector })
+              .walkRules(selector => {
+                selector.append({
+                  prop,
+                  value: `calc(${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})))`,
+                });
               });
-          });
 
-          root.insertAfter(rule.vw, rule.max);
+            rule.supports.append(rule.vw);
+
+            // max size
+            rule.max = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMax})` });
+
+            rule
+              .max
+              .append({selector: rule.selector})
+              .walkRules(selector => {
+                selector.append({
+                  prop,
+                  value: sizes.max,
+                });
+            });
+
+            rule.supports.append(rule.max);
+            }
         });
 
         decl.remove();
