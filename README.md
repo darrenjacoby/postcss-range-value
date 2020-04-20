@@ -55,7 +55,7 @@ postcssRange({
 }
 
 .range-value {
-    font-size: clamp(2rem, calc(2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48))), 6rem);
+    font-size: clamp(2rem, 2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48)), 6rem);
 }
 ```
 
