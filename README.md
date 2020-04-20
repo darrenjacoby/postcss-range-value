@@ -41,9 +41,9 @@ Example below with the current defaults.
 postcssRange({
     rootRem: 16,
     prefix: 'range',
-    modernBrowsersOnly: false,
     screenMin: '48rem', // 768
     screenMax: '87.5rem', // 1400
+    modernBrowsersOnly: false,
 })
 ```
 
