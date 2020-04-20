@@ -68,13 +68,13 @@ export default postcss.plugin('postcss-range-value', userOpts => {
           // support for clamp()
           // https://caniuse.com/#feat=css-math-functions
           // chrome 79+, ff 75+, edge 79+, opera 66+, andriod browser 80+
-          rule.append(postcss.decl({ prop, value: `clamp(${sizes.min}, calc(${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)}))), ${sizes.max})` }));
+          rule.append(postcss.decl({ prop, value: `clamp(${sizes.min}, ${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})), ${sizes.max})` }));
 
           // no support for clamp()
           // min size
           if (!opts.modernBrowsersOnly) {
             // supports
-            rule.supports = postcss.atRule({ name: 'supports not', params: `(${prop}: clamp(${sizes.min}, calc(${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)}))), ${sizes.max}))` });
+            rule.supports = postcss.atRule({ name: 'supports not', params: `(${prop}: clamp(${sizes.min}, ${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})), ${sizes.max}))` });
 
             root.insertAfter(rule, rule.supports);
 
