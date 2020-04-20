@@ -2,6 +2,8 @@
 
 PostCSS plugin to add support for **`range()`**, allowing for a responsive range value between two screen sizes.
 
+![Demo](.github/demo.gif)
+
 ### Installation
 
 ```shell
@@ -39,10 +41,25 @@ Example below with the current defaults.
 postcssRange({
     rootRem: 16,
     prefix: 'range',
+    modernBrowsersOnly: false,
     screenMin: '48rem', // 768
     screenMax: '87.5rem', // 1400
 })
 ```
+
+### In/Out
+
+```scss
+.range-value {
+    font-size: range(2rem, 6rem, 48rem, 87.5rem);
+}
+
+.range-value {
+    font-size: clamp(2rem, calc(2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48))), 6rem);
+}
+```
+
+Please note by default there is a media query appended for browsers that do not support CSS `clamp()`. You can disable this using `modernBrowsersOnly: true` in the config.
 
 ### Usage
 
