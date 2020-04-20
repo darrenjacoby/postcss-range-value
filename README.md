@@ -2,7 +2,7 @@
 
 PostCSS plugin to add support for **`range()`**, allowing for a responsive range value between two screen sizes.
 
-<img src=".github/demo.gif" width="450px" height="auto">
+<img src=".github/demo.gif" width="600px" height="auto">
 
 ### Installation
 
