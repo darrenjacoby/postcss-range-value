@@ -1,6 +1,6 @@
 {
   "name": "postcss-range-value",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "PostCSS range values",
   "author": "Darren Jacoby",
   "license": "MIT",
