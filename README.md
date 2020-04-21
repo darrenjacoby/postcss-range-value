@@ -47,20 +47,6 @@ postcssRange({
 })
 ```
 
-### In/Out
-
-```scss
-.range-value {
-    font-size: range(2rem, 6rem, 48rem, 87.5rem);
-}
-
-.range-value {
-    font-size: clamp(2rem, 2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48)), 6rem);
-}
-```
-
-Please note by default there is a media query appended for browsers that do not support CSS `clamp()`. You can disable this using `modernBrowsersOnly: true` in the config.
-
 ### Usage
 
 Range values can be passed to any CSS property that supports sizing.
@@ -126,5 +112,43 @@ There is shorthand support for `margin`, `margin-inline`, `margin-block` and `pa
 
 .range-value {
     margin: range(1.618, 10rem) range(1.618, 6rem) 2rem 2rem;
+}
+```
+
+### In/Out
+
+```scss
+.range-value {
+    font-size: range(2rem, 6rem, 48rem, 87.5rem);
+}
+
+.range-value {
+    font-size: clamp(2rem, 2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48)), 6rem);
+}
+```
+
+Please note by default there is a media query appended for browsers that do not support CSS `clamp()`. You can disable this using `modernBrowsersOnly: true` in the config.
+
+```scss
+.range-value {
+    font-size: clamp(2rem, 2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48)), 6rem);
+}
+
+@supports not (font-size: clamp(2rem, 2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48)), 6rem)) {
+  .range-value {
+    font-size: 2rem;
+  }
+
+  @media (min-width: 48rem) {
+    .range-value {
+      font-size: calc(2rem + (6 - 2) * ((100vw - 48rem) / (87.5 - 48)));
+    }
+  }
+
+  @media (min-width: 87.5rem) {
+    .range-value {
+      font-size: 6rem;
+    }
+  }
 }
 ```
