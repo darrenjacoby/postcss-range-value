@@ -70,7 +70,6 @@ export default postcss.plugin('postcss-range-value', userOpts => {
             // https://caniuse.com/#feat=css-math-functions
             // chrome 79+, ff 75+, edge 79+, opera 66+, andriod browser 80+
             rule.append(postcss.decl({ prop, value: `clamp(${sizes.min}, ${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})), ${sizes.max})` }));
-
           } 
 
           else {
