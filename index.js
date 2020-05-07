@@ -3,7 +3,7 @@ import shorthands from './shorthands';
 
 export default postcss.plugin('postcss-range-value', userOpts => {
   // config
-  const defaultOpts = { rootRem: 16, prefix: 'range', screenMin: '48rem', screenMax: '87.5rem', modernBrowsersOnly: false };
+  const defaultOpts = { rootRem: 16, prefix: 'range', screenMin: '48rem', screenMax: '100rem', clamp: true };
   const opts = { ...defaultOpts, ...userOpts };
   const regExp = new RegExp(escapeRegExp(opts.prefix) + '\\s*\\((.*)\\)', 'i');
 
@@ -65,28 +65,17 @@ export default postcss.plugin('postcss-range-value', userOpts => {
           const sizes = Object.assign({}, ...Object.entries({ min, max, screenMin, screenMax }).map(([k, v]) => ({ [k]: getUnitRem(v, opts.rootRem) })));
 
           // render
-          // support for clamp()
-          // https://caniuse.com/#feat=css-math-functions
-          // chrome 79+, ff 75+, edge 79+, opera 66+, andriod browser 80+
-          rule.append(postcss.decl({ prop, value: `clamp(${sizes.min}, ${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})), ${sizes.max})` }));
+          if (opts.clamp && getNumber(sizes.min) <= getNumber(sizes.max)) {
+            // clamp()
+            // https://caniuse.com/#feat=css-math-functions
+            // chrome 79+, ff 75+, edge 79+, opera 66+, andriod browser 80+
+            rule.append(postcss.decl({ prop, value: `clamp(${sizes.min}, ${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})), ${sizes.max})` }));
 
-          // no support for clamp()
-          // min size
-          if (!opts.modernBrowsersOnly) {
-            // supports
-            rule.supports = postcss.atRule({ name: 'supports not', params: `(${prop}: clamp(${sizes.min}, ${sizes.min} + (${getNumber(sizes.max)} - ${getNumber(sizes.min)}) * ((100vw - ${sizes.screenMin}) / (${getNumber(sizes.screenMax)} - ${getNumber(sizes.screenMin)})), ${sizes.max}))` });
+          } 
 
-            root.insertAfter(rule, rule.supports);
-
-            rule
-              .supports
-              .append({selector: rule.selector})
-              .walkRules(selector => {
-                selector.append({
-                  prop,
-                  value: sizes.min,
-                });
-            });
+          else {
+            // min size
+            rule.append(postcss.decl({ prop, value: sizes.min }));
 
             // vw based size
             rule.vw = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMin})` });
@@ -101,7 +90,7 @@ export default postcss.plugin('postcss-range-value', userOpts => {
                 });
               });
 
-            rule.supports.append(rule.vw);
+            root.insertAfter(rule, rule.vw);
 
             // max size
             rule.max = postcss.atRule({ name: 'media', params: `(min-width: ${sizes.screenMax})` });
@@ -116,8 +105,8 @@ export default postcss.plugin('postcss-range-value', userOpts => {
                 });
             });
 
-            rule.supports.append(rule.max);
-            }
+            root.insertAfter(rule.vw, rule.max);
+          }
         });
 
         decl.remove();
